@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Brain, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -25,15 +25,13 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-md px-6 animate-slide-up">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-6 glow-primary">
-            <Brain className="w-8 h-8 text-foreground" />
-          </div>
+          <img src="/nexora-ai-logo.png" alt="Nexora AI" className="w-20 h-20 mx-auto mb-6 object-contain" />
           <h1 className="text-3xl font-bold text-foreground tracking-tight">
-            EduAI <span className="text-gradient">OS</span>
+            Nexora <span className="text-gradient">AI</span>
           </h1>
           <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5">
             <Sparkles className="w-4 h-4 text-primary" />
-            AI Brain for Every Student
+            Next-Gen Intelligence for Every Student
           </p>
         </div>
 

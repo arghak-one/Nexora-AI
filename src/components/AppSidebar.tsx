@@ -7,7 +7,6 @@ import {
   CalendarCheck,
   ShieldAlert,
   LineChart,
-  Brain,
   Sparkles,
   DollarSign,
   FileText,
@@ -108,12 +107,10 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-border/50">
       {/* Logo */}
       <div className="p-4 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shrink-0">
-          <Brain className="w-5 h-5 text-foreground" />
-        </div>
+        <img src="/nexora-ai-logo.png" alt="Nexora AI" className="w-9 h-9 rounded-xl shrink-0 object-contain" />
         {!collapsed && (
           <span className="font-bold text-lg text-foreground tracking-tight">
-            EduAI <span className="text-gradient">OS</span>
+            Nexora <span className="text-gradient">AI</span>
           </span>
         )}
       </div>
