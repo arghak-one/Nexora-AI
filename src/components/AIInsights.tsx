@@ -1,4 +1,4 @@
-import { AlertTriangle, TrendingUp, Target, Sparkles } from "lucide-react";
+import { AlertTriangle, TrendingUp, Target, Lightbulb, Sparkles } from "lucide-react";
 
 const insights = [
   {
@@ -19,18 +19,26 @@ const insights = [
     description: "Physics needs attention — 40% of students scored below passing marks",
     variant: "primary" as const,
   },
+  {
+    icon: Lightbulb,
+    title: "Smart Suggestion",
+    description: "Recommend adaptive practice tests for students scoring 60-75% to maximize improvement",
+    variant: "accent" as const,
+  },
 ];
 
 const variantStyles = {
   destructive: "border-destructive/30 bg-destructive/5",
   success: "border-success/30 bg-success/5",
   primary: "border-primary/30 bg-primary/5",
+  accent: "border-accent/30 bg-accent/5",
 };
 
 const iconStyles = {
   destructive: "text-destructive bg-destructive/10",
   success: "text-success bg-success/10",
   primary: "text-primary bg-primary/10",
+  accent: "text-accent bg-accent/10",
 };
 
 const AIInsights = () => {
