@@ -7,7 +7,6 @@ import {
   CalendarCheck,
   ShieldAlert,
   LineChart,
-  Brain,
   Sparkles,
   DollarSign,
   FileText,
