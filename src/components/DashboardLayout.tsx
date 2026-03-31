@@ -1,7 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import NotificationPanel from "@/components/NotificationPanel";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -29,10 +30,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   className="w-64 pl-9 h-9 bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground text-sm focus:border-primary/50"
                 />
               </div>
-              <button className="relative p-2 rounded-xl hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary animate-pulse-glow" />
-              </button>
+              <NotificationPanel />
               <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center text-foreground font-semibold text-sm">
                 A
               </div>

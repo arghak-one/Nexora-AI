@@ -17,7 +17,7 @@ import AIInsightsPage from "./pages/AIInsightsPage.tsx";
 import Fees from "./pages/Fees.tsx";
 import Reports from "./pages/Reports.tsx";
 import Parents from "./pages/Parents.tsx";
-import Notifications from "./pages/Notifications.tsx";
+
 import SettingsPage from "./pages/SettingsPage.tsx";
 import Profile from "./pages/Profile.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -45,7 +45,7 @@ const App = () => (
           <Route path="/fees" element={<Fees />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/parents" element={<Parents />} />
-          <Route path="/notifications" element={<Notifications />} />
+          
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
