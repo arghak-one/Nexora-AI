@@ -120,3 +120,35 @@
     background-image: linear-gradient(135deg, hsl(190 95% 39%), hsl(217 91% 60%));
   }
 }
+
+/* Premium Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(240 60% 28% / 0.5) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, hsl(217 91% 60% / 0.4), hsl(262 83% 58% / 0.5));
+  border-radius: 9999px;
+  border: 1px solid hsl(262 83% 58% / 0.1);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, hsl(217 91% 60% / 0.7), hsl(262 83% 58% / 0.8));
+  box-shadow: 0 0 8px hsl(262 83% 58% / 0.4), 0 0 20px hsl(217 91% 60% / 0.15);
+  width: 8px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
