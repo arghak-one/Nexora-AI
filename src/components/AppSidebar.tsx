@@ -11,9 +11,7 @@ import {
   DollarSign,
   FileText,
   UserCheck,
-  
   Settings,
-  User,
   LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -88,7 +86,7 @@ const sections: Section[] = [
     items: [
       
       { title: "Settings", url: "/settings", icon: Settings },
-      { title: "Profile", url: "/profile", icon: User },
+      
     ],
   },
 ];
