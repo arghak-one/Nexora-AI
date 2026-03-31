@@ -11,9 +11,8 @@ import {
   DollarSign,
   FileText,
   UserCheck,
-  
   Settings,
-  User,
+  LogOut,
   LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
