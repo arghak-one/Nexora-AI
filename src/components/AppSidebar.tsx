@@ -106,10 +106,13 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border/50">
       {/* Logo */}
-      <div className="p-4 flex items-center gap-3">
-        <img src="/nexora-ai-logo.png" alt="Nexora AI" className="w-8 h-8 rounded-lg shrink-0 object-contain" />
+      <div className="p-4 flex items-center gap-3.5">
+        <div className="relative shrink-0">
+          <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-primary/30 to-accent/20 blur-md opacity-70" />
+          <img src="/nexora-ai-logo.png" alt="Nexora AI" className="relative w-10 h-10 rounded-xl object-contain drop-shadow-[0_0_6px_hsl(217_91%_60%/0.4)]" />
+        </div>
         {!collapsed && (
-          <span className="font-bold text-lg text-foreground tracking-tight">
+          <span className="font-extrabold text-[1.15rem] text-foreground tracking-tight leading-none">
             Nexora <span className="text-gradient">AI</span>
           </span>
         )}
