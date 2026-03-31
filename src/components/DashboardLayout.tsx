@@ -3,6 +3,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import NotificationPanel from "@/components/NotificationPanel";
+import ProfileDropdown from "@/components/ProfileDropdown";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
