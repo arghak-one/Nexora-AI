@@ -11,7 +11,7 @@ import {
   DollarSign,
   FileText,
   UserCheck,
-  Bell,
+  
   Settings,
   User,
   LogOut,
