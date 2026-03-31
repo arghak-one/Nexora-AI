@@ -32,9 +32,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 />
               </div>
               <NotificationPanel />
-              <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center text-foreground font-semibold text-sm">
-                A
-              </div>
+              <ProfileDropdown />
             </div>
           </header>
           <main className="flex-1 p-4 md:p-6 gradient-bg overflow-auto">
