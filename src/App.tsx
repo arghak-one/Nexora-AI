@@ -17,7 +17,7 @@ import AIInsightsPage from "./pages/AIInsightsPage.tsx";
 import Fees from "./pages/Fees.tsx";
 import Reports from "./pages/Reports.tsx";
 import Parents from "./pages/Parents.tsx";
-import Notifications from "./pages/Notifications.tsx";
+
 import SettingsPage from "./pages/SettingsPage.tsx";
 import Profile from "./pages/Profile.tsx";
 import NotFound from "./pages/NotFound.tsx";
