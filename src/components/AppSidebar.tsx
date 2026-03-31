@@ -88,7 +88,7 @@ const sections: Section[] = [
     items: [
       
       { title: "Settings", url: "/settings", icon: Settings },
-      { title: "Profile", url: "/profile", icon: User },
+      
     ],
   },
 ];
