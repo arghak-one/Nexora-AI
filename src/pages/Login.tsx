@@ -25,7 +25,7 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-md px-6 animate-slide-up">
         {/* Logo */}
         <div className="text-center mb-10">
-          <img src="/nexora-ai-logo.png" alt="Nexora AI" className="w-20 h-20 mx-auto mb-6 object-contain" />
+          <img src="/nexora-ai-logo.png" alt="Nexora AI" className="w-16 h-16 mx-auto mb-4 rounded-2xl object-contain" />
           <h1 className="text-3xl font-bold text-foreground tracking-tight">
             Nexora <span className="text-gradient">AI</span>
           </h1>
