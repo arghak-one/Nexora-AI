@@ -11,8 +11,6 @@ import {
   DollarSign,
   FileText,
   UserCheck,
-  Settings,
-  LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -25,7 +23,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -79,14 +76,6 @@ const sections: Section[] = [
       { title: "Fees", url: "/fees", icon: DollarSign },
       { title: "Reports", url: "/reports", icon: FileText },
       { title: "Parents", url: "/parents", icon: UserCheck },
-    ],
-  },
-  {
-    label: "General",
-    items: [
-      
-      { title: "Settings", url: "/settings", icon: Settings },
-      
     ],
   },
 ];
@@ -162,23 +151,6 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-
-      <SidebarFooter className="px-2 pb-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink
-                to="/"
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
-                activeClassName=""
-              >
-                <LogOut className="w-[18px] h-[18px] shrink-0" />
-                {!collapsed && <span>Logout</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   );
 }
