@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 
@@ -53,6 +54,8 @@ const Students = () => {
   const [classFilter, setClassFilter] = useState("All");
   const [riskFilter, setRiskFilter] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Student | null>(null);
   const navigate = useNavigate();
 
   // Form state
@@ -66,44 +69,80 @@ const Students = () => {
     setFormClass("9A");
     setFormAttendance("");
     setFormMarks("");
+    setEditingStudent(null);
   };
 
-  const handleAdd = () => {
+  const openEditModal = (student: Student) => {
+    setEditingStudent(student);
+    setFormName(student.name);
+    setFormClass(student.class);
+    setFormAttendance(String(student.attendance));
+    setFormMarks(String(student.marks));
+    setModalOpen(true);
+  };
+
+  const validateForm = (): { attendance: number; marks: number } | null => {
     if (!formName.trim()) {
       toast({ title: "Validation Error", description: "Full name is required.", variant: "destructive" });
-      return;
+      return null;
     }
     const attendance = Number(formAttendance);
     const marks = Number(formMarks);
     if (isNaN(attendance) || attendance < 0 || attendance > 100) {
       toast({ title: "Validation Error", description: "Attendance must be 0–100.", variant: "destructive" });
-      return;
+      return null;
     }
     if (isNaN(marks) || marks < 0 || marks > 100) {
       toast({ title: "Validation Error", description: "Marks must be 0–100.", variant: "destructive" });
-      return;
+      return null;
     }
+    return { attendance, marks };
+  };
 
-    const newStudent: Student = {
-      id: Date.now(),
-      name: formName.trim(),
-      class: formClass,
-      attendance,
-      marks,
-      risk: computeRisk(attendance, marks),
-      aiScore: computeAiScore(attendance, marks),
-      isNew: true,
-    };
+  const handleSubmit = () => {
+    const valid = validateForm();
+    if (!valid) return;
+    const { attendance, marks } = valid;
 
-    setStudents((prev) => [newStudent, ...prev]);
-    setModalOpen(false);
-    resetForm();
-    toast({ title: "Student added successfully", description: `${newStudent.name} has been enrolled.` });
+    if (editingStudent) {
+      // Update existing
+      setStudents((prev) =>
+        prev.map((s) =>
+          s.id === editingStudent.id
+            ? { ...s, name: formName.trim(), class: formClass, attendance, marks, risk: computeRisk(attendance, marks), aiScore: computeAiScore(attendance, marks) }
+            : s
+        )
+      );
+      setModalOpen(false);
+      resetForm();
+      toast({ title: "Student updated", description: `${formName.trim()}'s record has been updated.` });
+    } else {
+      // Add new
+      const newStudent: Student = {
+        id: Date.now(),
+        name: formName.trim(),
+        class: formClass,
+        attendance,
+        marks,
+        risk: computeRisk(attendance, marks),
+        aiScore: computeAiScore(attendance, marks),
+        isNew: true,
+      };
+      setStudents((prev) => [newStudent, ...prev]);
+      setModalOpen(false);
+      resetForm();
+      toast({ title: "Student added successfully", description: `${newStudent.name} has been enrolled.` });
+      setTimeout(() => {
+        setStudents((prev) => prev.map((s) => (s.id === newStudent.id ? { ...s, isNew: false } : s)));
+      }, 600);
+    }
+  };
 
-    // Remove animation flag after animation completes
-    setTimeout(() => {
-      setStudents((prev) => prev.map((s) => (s.id === newStudent.id ? { ...s, isNew: false } : s)));
-    }, 600);
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    setStudents((prev) => prev.filter((s) => s.id !== deleteTarget.id));
+    toast({ title: "Student removed", description: `${deleteTarget.name} has been removed.` });
+    setDeleteTarget(null);
   };
 
   const filtered = students.filter((s) => {
@@ -156,7 +195,7 @@ const Students = () => {
               <option value="High">High</option>
             </select>
             <Button
-              onClick={() => setModalOpen(true)}
+              onClick={() => { resetForm(); setModalOpen(true); }}
               className="h-9 px-4 gradient-primary text-foreground font-semibold rounded-xl shadow-[0_0_20px_-4px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_28px_-4px_hsl(var(--primary)/0.7)] transition-all duration-300"
             >
               <Plus className="w-4 h-4 mr-1" />
@@ -176,16 +215,16 @@ const Students = () => {
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Avg Marks</th>
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">AI Score</th>
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Risk</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((student) => (
                   <tr
                     key={student.id}
-                    onClick={() => navigate(`/students/${student.id}`)}
                     className={`border-b border-border/30 hover:bg-secondary/30 transition-all cursor-pointer group ${student.isNew ? "animate-fade-in" : ""}`}
                   >
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" onClick={() => navigate(`/students/${student.id}`)}>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-foreground font-semibold text-xs">
                           {student.name.split(" ").map((n) => n[0]).join("")}
@@ -193,14 +232,32 @@ const Students = () => {
                         <span className="font-medium text-foreground text-sm group-hover:text-primary transition-colors">{student.name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-sm text-muted-foreground">{student.class}</td>
-                    <td className="px-5 py-4 text-sm text-foreground">{student.attendance}%</td>
-                    <td className="px-5 py-4 text-sm text-foreground">{student.marks}</td>
-                    <td className="px-5 py-4 text-sm text-foreground">{student.aiScore}</td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4 text-sm text-muted-foreground" onClick={() => navigate(`/students/${student.id}`)}>{student.class}</td>
+                    <td className="px-5 py-4 text-sm text-foreground" onClick={() => navigate(`/students/${student.id}`)}>{student.attendance}%</td>
+                    <td className="px-5 py-4 text-sm text-foreground" onClick={() => navigate(`/students/${student.id}`)}>{student.marks}</td>
+                    <td className="px-5 py-4 text-sm text-foreground" onClick={() => navigate(`/students/${student.id}`)}>{student.aiScore}</td>
+                    <td className="px-5 py-4" onClick={() => navigate(`/students/${student.id}`)}>
                       <span className={`text-xs font-medium px-2.5 py-1 rounded-lg ${riskColors[student.risk]}`}>
                         {student.risk}
                       </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openEditModal(student); }}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                          title="Edit student"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(student); }}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+                          title="Delete student"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -210,12 +267,16 @@ const Students = () => {
         </div>
       </div>
 
-      {/* Add Student Modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      {/* Add / Edit Student Modal */}
+      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) resetForm(); }}>
         <DialogContent className="glass-strong border-border/50 rounded-2xl shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.3)] max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-foreground">Add New Student</DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm">Fill in the details below. Risk level and AI score are auto-calculated.</DialogDescription>
+            <DialogTitle className="text-xl font-bold text-foreground">
+              {editingStudent ? "Edit Student" : "Add New Student"}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm">
+              {editingStudent ? "Update the student details below." : "Fill in the details below. Risk level and AI score are auto-calculated."}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 pt-2">
@@ -270,7 +331,6 @@ const Students = () => {
               </div>
             </div>
 
-            {/* Live preview of computed values */}
             {formAttendance && formMarks && (
               <div className="flex gap-3 pt-1 animate-fade-in">
                 <div className="flex-1 rounded-xl bg-secondary/40 border border-border/30 p-3 text-center">
@@ -292,14 +352,38 @@ const Students = () => {
               Cancel
             </Button>
             <Button
-              onClick={handleAdd}
+              onClick={handleSubmit}
               className="gradient-primary text-foreground font-semibold rounded-xl shadow-[0_0_16px_-4px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_24px_-4px_hsl(var(--primary)/0.7)] transition-all duration-300"
             >
-              Add Student
+              {editingStudent ? "Save Changes" : "Add Student"}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent className="glass-strong border-border/50 rounded-2xl shadow-[0_8px_40px_-12px_hsl(var(--destructive)/0.3)]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-foreground">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Delete Student
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Are you sure you want to remove <span className="font-semibold text-foreground">{deleteTarget?.name}</span>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl border-border/50">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
