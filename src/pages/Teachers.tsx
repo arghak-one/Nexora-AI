@@ -405,41 +405,13 @@ const Teachers = () => {
               className={`glass rounded-2xl p-5 hover:scale-[1.02] transition-all duration-300 glow-teal cursor-pointer group ${teacher.isNew ? "animate-fade-in" : ""}`}
               onClick={() => setSelectedTeacher(teacher)}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl gradient-teal flex items-center justify-center text-foreground font-bold text-lg">
-                    {teacher.name.split(" ").slice(-1)[0][0]}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{teacher.name}</h3>
-                    <p className="text-sm text-muted-foreground">{teacher.subject}</p>
-                  </div>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl gradient-teal flex items-center justify-center text-foreground font-bold text-lg">
+                  {teacher.name.split(" ").slice(-1)[0][0]}
                 </div>
-                <div className="flex gap-1.5">
-                  <TooltipProvider delayDuration={200}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); openEditModal(teacher); }}
-                          className="p-2 rounded-[10px] text-muted-foreground/80 bg-secondary/40 hover:text-primary hover:bg-primary/15 hover:shadow-[0_0_12px_-3px_hsl(var(--primary)/0.4)] transition-all duration-200"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">Edit Teacher</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(teacher); }}
-                          className="p-2 rounded-[10px] text-muted-foreground/80 bg-secondary/40 hover:text-destructive hover:bg-destructive/15 hover:shadow-[0_0_12px_-3px_hsl(var(--destructive)/0.4)] transition-all duration-200"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">Delete Teacher</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                <div>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{teacher.name}</h3>
+                  <p className="text-sm text-muted-foreground">{teacher.subject}</p>
                 </div>
               </div>
               <div className="space-y-2 text-sm">
