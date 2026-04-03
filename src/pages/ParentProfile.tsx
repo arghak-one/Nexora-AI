@@ -63,9 +63,11 @@ const ParentProfile = () => {
   const [formPhone, setFormPhone] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formStudent, setFormStudent] = useState(allStudents[0].name);
+  const [formClass, setFormClass] = useState(allStudents[0].class);
+  const [classTouched, setClassTouched] = useState(false);
   const [formRelationship, setFormRelationship] = useState("Father");
 
-  const formStudentObj = allStudents.find((s) => s.name === formStudent) || allStudents[0];
+  const availableClasses = Array.from(new Set(allStudents.map((s) => s.class))).sort();
 
   useEffect(() => {
     saveParents(parents);
@@ -77,9 +79,24 @@ const ParentProfile = () => {
       setFormPhone(parent.phone);
       setFormEmail(parent.email);
       setFormStudent(parent.studentName);
+      setFormClass(parent.class);
+      setClassTouched(false);
       setFormRelationship(parent.relationship);
     }
   }, [parent]);
+
+  const handleStudentChange = (studentName: string) => {
+    setFormStudent(studentName);
+    if (!classTouched) {
+      const found = allStudents.find((s) => s.name === studentName);
+      if (found) setFormClass(found.class);
+    }
+  };
+
+  const handleClassChange = (cls: string) => {
+    setFormClass(cls);
+    setClassTouched(true);
+  };
 
   if (!parent) {
     return (
@@ -101,10 +118,9 @@ const ParentProfile = () => {
       toast({ title: "Validation Error", description: "Parent name is required.", variant: "destructive" });
       return;
     }
-    const studentObj = allStudents.find((s) => s.name === formStudent) || allStudents[0];
     const updated = parents.map((p) =>
       p.id === parent.id
-        ? { ...p, parentName: formName.trim(), phone: formPhone.trim(), email: formEmail.trim(), studentName: formStudent, class: studentObj.class, relationship: formRelationship }
+        ? { ...p, parentName: formName.trim(), phone: formPhone.trim(), email: formEmail.trim(), studentName: formStudent, class: formClass, relationship: formRelationship }
         : p
     );
     setParents(updated);
@@ -293,20 +309,29 @@ const ParentProfile = () => {
               <Label className="text-sm text-muted-foreground">Email</Label>
               <Input data-testid="input-edit-email" placeholder="parent@example.com" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} className={inputClasses} />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm text-muted-foreground">Linked Student</Label>
-              <select
-                data-testid="select-edit-student"
-                value={formStudent}
-                onChange={(e) => setFormStudent(e.target.value)}
-                className="w-full h-10 px-3 bg-secondary/50 border border-border/50 text-foreground rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
-              >
-                {allStudents.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
-              </select>
-            </div>
-            <div className="flex items-center gap-2 rounded-xl bg-secondary/40 border border-border/30 px-4 py-2.5">
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">Class auto-filled:</span>
-              <span className="text-sm font-semibold text-primary">{formStudentObj.class}</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm text-muted-foreground">Linked Student</Label>
+                <select
+                  data-testid="select-edit-student"
+                  value={formStudent}
+                  onChange={(e) => handleStudentChange(e.target.value)}
+                  className="w-full h-10 px-3 bg-secondary/50 border border-border/50 text-foreground rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+                >
+                  {allStudents.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm text-muted-foreground">Class</Label>
+                <select
+                  data-testid="select-edit-class"
+                  value={formClass}
+                  onChange={(e) => handleClassChange(e.target.value)}
+                  className="w-full h-10 px-3 bg-secondary/50 border border-border/50 text-foreground rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+                >
+                  {availableClasses.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
