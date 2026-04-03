@@ -9,64 +9,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { store, Parent } from "@/lib/store";
 
-export interface Parent {
-  id: number;
-  parentName: string;
-  phone: string;
-  email: string;
-  studentName: string;
-  class: string;
-  relationship: string;
-  isNew?: boolean;
-}
-
-const STORAGE_KEY = "nexora_parents";
-
-const allStudents = [
-  { name: "Rahul Kumar", class: "10A", attendance: 95, marks: 88, risk: "Low", aiScore: 9.2 },
-  { name: "Priya Sharma", class: "10A", attendance: 72, marks: 65, risk: "High", aiScore: 5.8 },
-  { name: "Amit Patel", class: "10B", attendance: 88, marks: 76, risk: "Low", aiScore: 7.9 },
-  { name: "Sneha Gupta", class: "9A", attendance: 91, marks: 82, risk: "Low", aiScore: 8.5 },
-  { name: "Vikram Singh", class: "10B", attendance: 58, marks: 45, risk: "High", aiScore: 3.2 },
-  { name: "Ananya Das", class: "9B", attendance: 85, marks: 79, risk: "Medium", aiScore: 7.1 },
-  { name: "Rohan Mehta", class: "9A", attendance: 93, marks: 91, risk: "Low", aiScore: 9.5 },
-  { name: "Kavita Reddy", class: "10A", attendance: 78, marks: 68, risk: "Medium", aiScore: 6.4 },
-];
-
-const defaultParents: Parent[] = [
-  { id: 1, parentName: "Mr. Sanjay Kumar", phone: "+91 98765 43210", email: "sanjay@mail.com", studentName: "Rahul Kumar", class: "10A", relationship: "Father" },
-  { id: 2, parentName: "Mrs. Rekha Sharma", phone: "+91 98765 43211", email: "rekha@mail.com", studentName: "Priya Sharma", class: "10A", relationship: "Mother" },
-  { id: 3, parentName: "Mr. Dinesh Patel", phone: "+91 98765 43212", email: "dinesh@mail.com", studentName: "Amit Patel", class: "10B", relationship: "Father" },
-  { id: 4, parentName: "Mrs. Sunita Gupta", phone: "+91 98765 43213", email: "sunita@mail.com", studentName: "Sneha Gupta", class: "9A", relationship: "Mother" },
-  { id: 5, parentName: "Mr. Harish Singh", phone: "+91 98765 43214", email: "harish@mail.com", studentName: "Vikram Singh", class: "10B", relationship: "Father" },
-  { id: 6, parentName: "Mrs. Lakshmi Das", phone: "+91 98765 43215", email: "lakshmi@mail.com", studentName: "Ananya Das", class: "9B", relationship: "Mother" },
-];
-
-function loadParents(): Parent[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed: Parent[] = JSON.parse(stored);
-      const existingIds = new Set(parsed.map((p) => p.id));
-      const merged = [...parsed];
-      for (const d of defaultParents) {
-        if (!existingIds.has(d.id)) merged.push(d);
-      }
-      return merged;
-    }
-  } catch {}
-  return defaultParents;
-}
-
-function saveParents(parents: Parent[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(parents.map((p) => ({ ...p, isNew: false }))));
-}
+// Code using store
 
 const relationshipOptions = ["Father", "Mother", "Guardian"];
 
 const Parents = () => {
-  const [parents, setParents] = useState<Parent[]>(loadParents);
+  const [parents, setParents] = useState<Parent[]>(() => store.getParents());
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("All");
   const [studentFilter, setStudentFilter] = useState("All");
@@ -79,22 +29,23 @@ const Parents = () => {
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formEmail, setFormEmail] = useState("");
-  const [formStudent, setFormStudent] = useState(allStudents[0].name);
-  const [formClass, setFormClass] = useState(allStudents[0].class);
+  const [formStudent, setFormStudent] = useState("Rahul Kumar");
+  const [formClass, setFormClass] = useState("10A");
   const [classTouched, setClassTouched] = useState(false);
   const [formRelationship, setFormRelationship] = useState("Father");
 
-  const availableClasses = Array.from(new Set(allStudents.map((s) => s.class))).sort();
+  const students = store.getStudents();
+  const availableClasses = Array.from(new Set(students.map((s) => s.class))).sort();
 
 
   useEffect(() => {
-    saveParents(parents);
+    store.setParents(parents);
   }, [parents]);
 
   const handleStudentChange = (studentName: string) => {
     setFormStudent(studentName);
     if (!classTouched) {
-      const found = allStudents.find((s) => s.name === studentName);
+      const found = students.find((s) => s.name === studentName);
       if (found) setFormClass(found.class);
     }
   };
@@ -108,8 +59,8 @@ const Parents = () => {
     setFormName("");
     setFormPhone("");
     setFormEmail("");
-    setFormStudent(allStudents[0].name);
-    setFormClass(allStudents[0].class);
+    setFormStudent("Rahul Kumar");
+    setFormClass("10A");
     setClassTouched(false);
     setFormRelationship("Father");
     setEditingParent(null);
@@ -185,8 +136,8 @@ const Parents = () => {
     setDeleteTarget(null);
   };
 
-  const uniqueClasses = ["All", ...Array.from(new Set(allStudents.map((s) => s.class))).sort()];
-  const uniqueStudents = ["All", ...allStudents.map((s) => s.name)];
+  const uniqueClasses = ["All", ...Array.from(new Set(students.map((s) => s.class))).sort()];
+  const uniqueStudents = ["All", ...students.map((s) => s.name)];
 
   const filtered = parents.filter((p) => {
     const q = search.toLowerCase();
@@ -414,7 +365,7 @@ const Parents = () => {
                   onChange={(e) => handleStudentChange(e.target.value)}
                   className="w-full h-10 px-3 bg-secondary/50 border border-border/50 text-foreground rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
                 >
-                  {allStudents.map((s) => (
+                  {students.map((s) => (
                     <option key={s.name} value={s.name}>{s.name}</option>
                   ))}
                 </select>

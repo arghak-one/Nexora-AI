@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Search, Plus, Pencil, Trash2, AlertTriangle } from "lucide-react";
@@ -9,28 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-
-interface Student {
-  id: number;
-  name: string;
-  class: string;
-  attendance: number;
-  marks: number;
-  risk: string;
-  aiScore: number;
-  isNew?: boolean;
-}
-
-const initialStudents: Student[] = [
-  { id: 1, name: "Rahul Kumar", class: "10A", attendance: 95, marks: 88, risk: "Low", aiScore: 9.2 },
-  { id: 2, name: "Priya Sharma", class: "10A", attendance: 72, marks: 65, risk: "High", aiScore: 5.8 },
-  { id: 3, name: "Amit Patel", class: "10B", attendance: 88, marks: 76, risk: "Low", aiScore: 7.9 },
-  { id: 4, name: "Sneha Gupta", class: "9A", attendance: 91, marks: 82, risk: "Low", aiScore: 8.5 },
-  { id: 5, name: "Vikram Singh", class: "10B", attendance: 58, marks: 45, risk: "High", aiScore: 3.2 },
-  { id: 6, name: "Ananya Das", class: "9B", attendance: 85, marks: 79, risk: "Medium", aiScore: 7.1 },
-  { id: 7, name: "Rohan Mehta", class: "9A", attendance: 93, marks: 91, risk: "Low", aiScore: 9.5 },
-  { id: 8, name: "Kavita Reddy", class: "10A", attendance: 78, marks: 68, risk: "Medium", aiScore: 6.4 },
-];
+import { store, Student } from "@/lib/store";
 
 const riskColors: Record<string, string> = {
   Low: "bg-success/10 text-success",
@@ -50,7 +29,7 @@ function computeAiScore(attendance: number, marks: number): number {
 }
 
 const Students = () => {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [students, setStudents] = useState<Student[]>(() => store.getStudents());
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("All");
   const [riskFilter, setRiskFilter] = useState("All");
@@ -64,6 +43,10 @@ const Students = () => {
   const [formClass, setFormClass] = useState("9A");
   const [formAttendance, setFormAttendance] = useState("");
   const [formMarks, setFormMarks] = useState("");
+
+  useEffect(() => {
+    store.setStudents(students);
+  }, [students]);
 
   const resetForm = () => {
     setFormName("");

@@ -1,29 +1,35 @@
 import { AlertTriangle, TrendingUp, Target, Lightbulb, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { InsightDetailModal, InsightData } from "./InsightDetailModal";
 
-const insights = [
+const insights: InsightData[] = [
   {
     icon: AlertTriangle,
     title: "Student at Risk",
     description: "3 students flagged due to low attendance (<60%) in the last 2 weeks",
-    variant: "destructive" as const,
+    variant: "destructive",
+    type: "risk",
   },
   {
     icon: TrendingUp,
     title: "Performance Improving",
     description: "Overall class average improved by 8% compared to last month",
-    variant: "success" as const,
+    variant: "success",
+    type: "improvement",
   },
   {
     icon: Target,
     title: "Focus on Weak Subjects",
     description: "Physics needs attention — 40% of students scored below passing marks",
-    variant: "primary" as const,
+    variant: "primary",
+    type: "focus",
   },
   {
     icon: Lightbulb,
     title: "Smart Suggestion",
     description: "Recommend adaptive practice tests for students scoring 60-75% to maximize improvement",
-    variant: "accent" as const,
+    variant: "accent",
+    type: "suggestion",
   },
 ];
 
@@ -42,6 +48,14 @@ const iconStyles = {
 };
 
 const AIInsights = () => {
+  const [selectedInsight, setSelectedInsight] = useState<InsightData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleInsightClick = (insight: InsightData) => {
+    setSelectedInsight(insight);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="glass rounded-2xl p-5 glow-accent">
       <div className="flex items-center gap-2 mb-1">
@@ -53,9 +67,11 @@ const AIInsights = () => {
         {insights.map((insight, i) => (
           <div
             key={i}
-            className={`p-4 rounded-xl border ${variantStyles[insight.variant]} transition-all duration-200 hover:scale-[1.01]`}
+            onClick={() => handleInsightClick(insight)}
+            className={`p-4 rounded-xl border ${variantStyles[insight.variant]} cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 relative group`}
           >
-            <div className="flex items-start gap-3">
+            <div className="absolute inset-0 bg-foreground/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+            <div className="flex items-start gap-3 pointer-events-none">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconStyles[insight.variant]}`}>
                 <insight.icon className="w-4 h-4" />
               </div>
@@ -67,6 +83,11 @@ const AIInsights = () => {
           </div>
         ))}
       </div>
+      <InsightDetailModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        insight={selectedInsight}
+      />
     </div>
   );
 };

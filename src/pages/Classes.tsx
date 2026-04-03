@@ -9,43 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { store, ClassItem as ClassData } from "@/lib/store";
 
-interface ClassData {
-  id: number;
-  name: string;
-  teacher: string;
-  students: number;
-  avgScore: number;
-  attendance: number;
-  isNew?: boolean;
-}
-
-const STORAGE_KEY = "classes_data";
-
-const defaultClasses: ClassData[] = [
-  { id: 1, name: "Class 9A", students: 32, teacher: "Dr. Meera Roy", avgScore: 81, attendance: 91 },
-  { id: 2, name: "Class 9B", students: 30, teacher: "Mr. Anil Das", avgScore: 74, attendance: 86 },
-  { id: 3, name: "Class 10A", students: 35, teacher: "Ms. Priya Jain", avgScore: 79, attendance: 89 },
-  { id: 4, name: "Class 10B", students: 28, teacher: "Dr. Suresh Nair", avgScore: 72, attendance: 84 },
-  { id: 5, name: "Class 11A", students: 34, teacher: "Mrs. Kavita Rao", avgScore: 85, attendance: 93 },
-  { id: 6, name: "Class 12A", students: 31, teacher: "Mr. Rajesh Kumar", avgScore: 77, attendance: 88 },
-];
-
-function loadClasses(): ClassData[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return defaultClasses;
-}
-
-function saveClasses(classes: ClassData[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(classes));
-}
+// Extracted to store
 
 const Classes = () => {
   const { toast } = useToast();
-  const [classes, setClasses] = useState<ClassData[]>(loadClasses);
+  const [classes, setClasses] = useState<ClassData[]>(() => store.getClasses() as ClassData[]);
   const [search, setSearch] = useState("");
   const [teacherFilter, setTeacherFilter] = useState("all");
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
@@ -59,7 +29,7 @@ const Classes = () => {
   const [formAvgScore, setFormAvgScore] = useState("");
   const [formAttendance, setFormAttendance] = useState("");
 
-  useEffect(() => { saveClasses(classes); }, [classes]);
+  useEffect(() => { store.setClasses(classes); }, [classes]);
 
   const teachers = Array.from(new Set(classes.map(c => c.teacher)));
 

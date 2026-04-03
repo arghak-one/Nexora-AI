@@ -8,21 +8,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/hooks/use-toast";
+import { store, ResultRecord } from "@/lib/store";
 
-interface ResultRecord {
-  id: number;
-  studentName: string;
-  class: string;
-  subject: string;
-  marks: number;
-  total: number;
-  percentage: number;
-  status: string;
-  grade: string;
-  isNew?: boolean;
-}
+// Store usage
 
-const STORAGE_KEY = "results_data";
+const gradeColors: Record<string, string> = {
+  "A+": "bg-success/15 text-success",
+  A: "bg-success/10 text-success",
+  B: "bg-primary/10 text-primary",
+  C: "bg-warning/10 text-warning",
+  D: "bg-warning/15 text-warning",
+  F: "bg-destructive/10 text-destructive",
+};
+
+type ViewMode = "summary" | "individual";
 
 const subjects = ["Mathematics", "Physics", "Chemistry", "English", "Computer Science", "Biology"];
 const classes = ["9A", "9B", "10A", "10B"];
@@ -36,50 +35,8 @@ function computeGrade(pct: number): string {
   return "F";
 }
 
-const defaultResults: ResultRecord[] = [
-  { id: 1, studentName: "Rahul Kumar", class: "10A", subject: "Mathematics", marks: 88, total: 100, percentage: 88, status: "Pass", grade: "A" },
-  { id: 2, studentName: "Priya Sharma", class: "10A", subject: "Mathematics", marks: 42, total: 100, percentage: 42, status: "Fail", grade: "F" },
-  { id: 3, studentName: "Amit Patel", class: "10B", subject: "Physics", marks: 76, total: 100, percentage: 76, status: "Pass", grade: "B" },
-  { id: 4, studentName: "Sneha Gupta", class: "9A", subject: "Chemistry", marks: 91, total: 100, percentage: 91, status: "Pass", grade: "A+" },
-  { id: 5, studentName: "Vikram Singh", class: "10B", subject: "English", marks: 55, total: 100, percentage: 55, status: "Pass", grade: "D" },
-  { id: 6, studentName: "Ananya Das", class: "9B", subject: "Computer Science", marks: 95, total: 100, percentage: 95, status: "Pass", grade: "A+" },
-  { id: 7, studentName: "Rohan Mehta", class: "9A", subject: "Biology", marks: 38, total: 100, percentage: 38, status: "Fail", grade: "F" },
-  { id: 8, studentName: "Kavita Reddy", class: "10A", subject: "Physics", marks: 82, total: 100, percentage: 82, status: "Pass", grade: "A" },
-  { id: 9, studentName: "Rahul Kumar", class: "10A", subject: "English", marks: 99, total: 100, percentage: 99, status: "Pass", grade: "A+" },
-  { id: 10, studentName: "Priya Sharma", class: "10A", subject: "Chemistry", marks: 65, total: 100, percentage: 65, status: "Pass", grade: "C" },
-  { id: 11, studentName: "Amit Patel", class: "10B", subject: "Mathematics", marks: 72, total: 100, percentage: 72, status: "Pass", grade: "B" },
-  { id: 12, studentName: "Sneha Gupta", class: "9A", subject: "English", marks: 85, total: 100, percentage: 85, status: "Pass", grade: "A" },
-  { id: 13, studentName: "Vikram Singh", class: "10B", subject: "Computer Science", marks: 60, total: 100, percentage: 60, status: "Pass", grade: "C" },
-  { id: 14, studentName: "Ananya Das", class: "9B", subject: "Mathematics", marks: 79, total: 100, percentage: 79, status: "Pass", grade: "B" },
-  { id: 15, studentName: "Rohan Mehta", class: "9A", subject: "Mathematics", marks: 93, total: 100, percentage: 93, status: "Pass", grade: "A+" },
-  { id: 16, studentName: "Kavita Reddy", class: "10A", subject: "Chemistry", marks: 68, total: 100, percentage: 68, status: "Pass", grade: "C" },
-];
-
-function loadResults(): ResultRecord[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return defaultResults;
-}
-
-function saveResults(data: ResultRecord[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-const gradeColors: Record<string, string> = {
-  "A+": "bg-success/15 text-success",
-  A: "bg-success/10 text-success",
-  B: "bg-primary/10 text-primary",
-  C: "bg-warning/10 text-warning",
-  D: "bg-warning/15 text-warning",
-  F: "bg-destructive/10 text-destructive",
-};
-
-type ViewMode = "summary" | "individual";
-
 const Results = () => {
-  const [results, setResults] = useState<ResultRecord[]>(loadResults);
+  const [results, setResults] = useState<ResultRecord[]>(() => store.getResults());
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("All");
   const [subjectFilter, setSubjectFilter] = useState("All");
@@ -96,7 +53,7 @@ const Results = () => {
   const [formTotal, setFormTotal] = useState("100");
 
   useEffect(() => {
-    saveResults(results);
+    store.setResults(results);
   }, [results]);
 
   const resetForm = () => {

@@ -7,9 +7,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { store, useStoreUpdate } from "@/lib/store";
 
 const ProfileDropdown = () => {
   const navigate = useNavigate();
+  useStoreUpdate();
+  const profile = store.getUserProfile();
 
   return (
     <DropdownMenu>
@@ -18,7 +21,7 @@ const ProfileDropdown = () => {
           <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-primary/50 to-accent/40 opacity-0 group-hover:opacity-100 blur-md transition-all duration-500 group-hover:scale-110" />
           <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-primary/30 to-accent/20 opacity-0 group-hover:opacity-80 transition-opacity duration-300" />
           <div className="relative w-9 h-9 rounded-xl gradient-primary flex items-center justify-center text-foreground font-semibold text-sm ring-1 ring-border/30 group-hover:ring-primary/60 transition-all duration-300 group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
-            A
+            {profile.name.charAt(0).toUpperCase()}
           </div>
         </button>
       </DropdownMenuTrigger>
@@ -32,12 +35,12 @@ const ProfileDropdown = () => {
           <div className="relative group/avatar">
             <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-primary/40 to-accent/30 blur-sm opacity-60" />
             <div className="relative w-10 h-10 rounded-xl gradient-primary flex items-center justify-center text-foreground font-bold text-sm shrink-0 ring-1 ring-primary/20">
-              A
+              {profile.name.charAt(0).toUpperCase()}
             </div>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">Argha Mukherjee</p>
-            <p className="text-xs text-muted-foreground">Admin</p>
+            <p className="text-sm font-semibold text-foreground truncate">{profile.name}</p>
+            <p className="text-xs text-muted-foreground">{profile.role}</p>
           </div>
         </div>
 

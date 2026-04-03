@@ -8,42 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-
-interface Teacher {
-  id: number;
-  name: string;
-  subject: string;
-  classes: string[];
-  email: string;
-  rating: number;
-  isNew?: boolean;
-}
-
-const STORAGE_KEY = "teachers_data";
-
-const defaultTeachers: Teacher[] = [
-  { id: 1, name: "Dr. Meera Roy", subject: "Mathematics", classes: ["9A", "10A"], email: "meera@eduai.com", rating: 4.8 },
-  { id: 2, name: "Mr. Anil Das", subject: "Physics", classes: ["9B", "10B"], email: "anil@eduai.com", rating: 4.5 },
-  { id: 3, name: "Ms. Priya Jain", subject: "Chemistry", classes: ["10A", "11A"], email: "priya@eduai.com", rating: 4.9 },
-  { id: 4, name: "Dr. Suresh Nair", subject: "English", classes: ["10B", "12A"], email: "suresh@eduai.com", rating: 4.3 },
-  { id: 5, name: "Mrs. Kavita Rao", subject: "Computer Science", classes: ["11A", "12A"], email: "kavita@eduai.com", rating: 4.7 },
-  { id: 6, name: "Mr. Rajesh Kumar", subject: "Biology", classes: ["9A", "9B"], email: "rajesh@eduai.com", rating: 4.6 },
-];
+import { store, Teacher } from "@/lib/store";
 
 const subjects = ["Mathematics", "Physics", "Chemistry", "English", "Computer Science", "Biology", "History", "Geography"];
 const allClasses = ["9A", "9B", "10A", "10B", "11A", "11B", "12A", "12B"];
-
-function loadTeachers(): Teacher[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return defaultTeachers;
-}
-
-function saveTeachers(teachers: Teacher[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(teachers));
-}
 
 const ratingColor = (r: number) => {
   if (r >= 4.5) return "text-success";
@@ -52,7 +20,7 @@ const ratingColor = (r: number) => {
 };
 
 const Teachers = () => {
-  const [teachers, setTeachers] = useState<Teacher[]>(loadTeachers);
+  const [teachers, setTeachers] = useState<Teacher[]>(() => store.getTeachers());
   const [search, setSearch] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -68,7 +36,7 @@ const Teachers = () => {
   const [formRating, setFormRating] = useState("");
 
   useEffect(() => {
-    saveTeachers(teachers);
+    store.setTeachers(teachers);
   }, [teachers]);
 
   const resetForm = () => {

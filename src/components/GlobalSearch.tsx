@@ -10,42 +10,7 @@ interface SearchResult {
   href: string;
 }
 
-const STUDENTS = [
-  { id: 1, name: "Rahul Kumar", class: "10A" },
-  { id: 2, name: "Priya Sharma", class: "10A" },
-  { id: 3, name: "Amit Patel", class: "10B" },
-  { id: 4, name: "Sneha Gupta", class: "9A" },
-  { id: 5, name: "Vikram Singh", class: "10B" },
-  { id: 6, name: "Ananya Das", class: "9B" },
-  { id: 7, name: "Rohan Mehta", class: "9A" },
-  { id: 8, name: "Kavita Reddy", class: "10A" },
-];
-
-const TEACHERS = [
-  { id: 1, name: "Dr. Meera Roy", subject: "Mathematics" },
-  { id: 2, name: "Mr. Anil Das", subject: "Physics" },
-  { id: 3, name: "Ms. Priya Jain", subject: "Chemistry" },
-  { id: 4, name: "Dr. Suresh Nair", subject: "English" },
-  { id: 5, name: "Mrs. Kavita Rao", subject: "Computer Science" },
-  { id: 6, name: "Mr. Rajesh Kumar", subject: "Biology" },
-];
-
-const CLASSES = [
-  { id: 1, name: "Class 9A", teacher: "Dr. Meera Roy" },
-  { id: 2, name: "Class 9B", teacher: "Mr. Anil Das" },
-  { id: 3, name: "Class 10A", teacher: "Ms. Priya Jain" },
-  { id: 4, name: "Class 10B", teacher: "Dr. Suresh Nair" },
-  { id: 5, name: "Class 11A", teacher: "Mrs. Kavita Rao" },
-  { id: 6, name: "Class 12A", teacher: "Mr. Rajesh Kumar" },
-];
-
-function loadParents(): Array<{ id: number; parentName: string; studentName: string; class: string }> {
-  try {
-    const stored = localStorage.getItem("nexora_parents");
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return [];
-}
+import { store, useStoreUpdate } from "@/lib/store";
 
 function runSearch(query: string): SearchResult[] {
   if (!query.trim()) return [];
@@ -53,33 +18,37 @@ function runSearch(query: string): SearchResult[] {
   const results: SearchResult[] = [];
 
   // Students
-  for (const s of STUDENTS) {
+  const students = store.getStudents();
+  for (const s of students) {
     if (s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q)) {
       results.push({ id: `student-${s.id}`, label: s.name, sublabel: `Class ${s.class}`, type: "Student", href: `/students/${s.id}` });
     }
   }
 
   // Teachers
-  for (const t of TEACHERS) {
-    if (t.name.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q)) {
+  const teachers = store.getTeachers();
+  for (const t of teachers) {
+    if (t.name.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q) || t.email.toLowerCase().includes(q)) {
       results.push({ id: `teacher-${t.id}`, label: t.name, sublabel: t.subject, type: "Teacher", href: "/teachers" });
     }
   }
 
   // Parents
-  const parents = loadParents();
+  const parents = store.getParents();
   for (const p of parents) {
     if (
       p.parentName.toLowerCase().includes(q) ||
       p.studentName.toLowerCase().includes(q) ||
-      p.class.toLowerCase().includes(q)
+      p.class.toLowerCase().includes(q) ||
+      (p.email && p.email.toLowerCase().includes(q))
     ) {
       results.push({ id: `parent-${p.id}`, label: p.parentName, sublabel: `Parent of ${p.studentName}`, type: "Parent", href: `/parents/${p.id}` });
     }
   }
 
   // Classes
-  for (const c of CLASSES) {
+  const classes = store.getClasses();
+  for (const c of classes) {
     if (c.name.toLowerCase().includes(q) || c.teacher.toLowerCase().includes(q)) {
       results.push({ id: `class-${c.id}`, label: c.name, sublabel: c.teacher, type: "Class", href: "/classes" });
     }
@@ -111,6 +80,7 @@ const GlobalSearch = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
+  useStoreUpdate();
 
   const doSearch = useCallback((q: string) => {
     setResults(runSearch(q));

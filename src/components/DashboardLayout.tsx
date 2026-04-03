@@ -3,12 +3,22 @@ import { AppSidebar } from "@/components/AppSidebar";
 import NotificationPanel from "@/components/NotificationPanel";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import GlobalSearch from "@/components/GlobalSearch";
+import { useEffect, useState } from "react";
+import { store, useStoreUpdate } from "@/lib/store";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+  const [mounted, setMounted] = useState(false);
+  useStoreUpdate();
+  const profile = store.getUserProfile();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -19,7 +29,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="flex items-center gap-3">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
               <div className="hidden md:block">
-                <h2 className="text-lg font-semibold text-foreground">Welcome back, <span className="text-gradient">Argha</span></h2>
+                <h2 className="text-lg font-semibold text-foreground">Welcome back, <span className="text-gradient">{mounted ? profile.name.split(' ')[0] : '...'}</span></h2>
+                <p className="text-xs text-muted-foreground hidden sm:block">Here's what's happening today.</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
