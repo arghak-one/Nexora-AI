@@ -1,9 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import NotificationPanel from "@/components/NotificationPanel";
 import ProfileDropdown from "@/components/ProfileDropdown";
+import GlobalSearch from "@/components/GlobalSearch";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -24,13 +23,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search..."
-                  className="w-64 pl-9 h-9 bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground text-sm focus:border-primary/50"
-                />
-              </div>
+              <GlobalSearch />
               <NotificationPanel />
               <ProfileDropdown />
             </div>

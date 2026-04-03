@@ -1,0 +1,143 @@
+Fix the top global search bar to make it fully functional, intelligent, and integrated across the entire dashboard.
+
+---
+
+Problem:
+- The top search bar currently does nothing
+- No event handling, no filtering, no navigation
+
+---
+
+Goal:
+- Make it a GLOBAL SEARCH system
+- Search across:
+  ✔ Students
+  ✔ Teachers
+  ✔ Parents
+  ✔ Classes
+  ✔ Results (optional)
+
+---
+
+1. Add Input Event Listener
+
+On typing in search bar:
+- Capture input value
+- Trigger real-time search (onChange / onInput)
+
+---
+
+2. Create Global Search Function
+
+Function should:
+- Take search query
+- Convert to lowercase
+- Match against:
+
+Students:
+- name
+- class
+
+Teachers:
+- name
+- subject
+
+Parents:
+- parent name
+- child name
+
+Classes:
+- class name
+
+---
+
+3. Search Behavior (IMPORTANT)
+
+While typing:
+- Show LIVE suggestions dropdown below search bar
+
+Each result should show:
+- Name
+- Type (Student / Teacher / Parent / Class)
+- Small icon
+
+Example:
+Rahul Kumar — Student  
+Meera Roy — Teacher  
+Class 10A — Class  
+
+---
+
+4. Click Result → Navigate
+
+When clicking a result:
+
+- Student → go to student list OR highlight student
+- Teacher → go to teacher detail
+- Parent → open parent detail
+- Class → open class detail
+
+---
+
+5. Dropdown UI (VERY IMPORTANT)
+
+- Floating dropdown under search bar
+- Dark theme (match Nexora AI UI)
+- Rounded corners
+- Glow border
+- Max height + scroll
+
+---
+
+6. Empty State
+
+If no results:
+→ Show "No results found"
+
+---
+
+7. Debounce Optimization
+
+- Add 300ms delay before search
+- Prevent unnecessary re-renders
+
+---
+
+8. Keyboard Navigation (PRO FEATURE)
+
+- Arrow keys to navigate results
+- Enter to select
+
+---
+
+9. Fallback Behavior
+
+If user presses Enter:
+→ Navigate to a "Search Results Page"
+
+(optional advanced)
+
+---
+
+10. Data Source
+
+Search from:
+- localStorage data (students, parents, etc.)
+- OR state data if using React
+
+---
+
+11. Performance Rule
+
+- Do NOT re-render entire page
+- Only update dropdown results
+
+---
+
+Final Goal:
+
+Search bar should feel like:
+✔ Smart
+✔ Instant
+✔ App-wide navigation tool
+✔ Premium SaaS feature
