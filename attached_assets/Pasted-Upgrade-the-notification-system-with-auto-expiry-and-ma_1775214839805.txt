@@ -1,0 +1,135 @@
+Upgrade the notification system with auto-expiry and manual deletion functionality.
+
+---
+
+Goal:
+- Notifications auto delete after 7 days
+- User can manually delete any notification
+- UI remains clean and responsive
+- State persists correctly
+
+---
+
+1. Update Notification Data Structure
+
+Each notification must include:
+
+{
+  id: unique_id,
+  title: string,
+  description: string,
+  time: string,
+  createdAt: timestamp,   // VERY IMPORTANT
+  isRead: false
+}
+
+Use:
+createdAt = Date.now()
+
+---
+
+2. Auto Delete Logic (7 Days Expiry)
+
+On app load (VERY IMPORTANT):
+
+- Load notifications from localStorage
+- Filter notifications:
+
+Keep only those where:
+(current_time - createdAt) < 7 days
+
+7 days in ms:
+7 * 24 * 60 * 60 * 1000
+
+Example:
+const now = Date.now();
+notifications = notifications.filter(
+  n => now - n.createdAt < 604800000
+);
+
+- Save filtered data back to localStorage
+
+---
+
+3. Manual Delete Button (UI)
+
+For each notification item:
+
+- Add a small ❌ (cross icon) at top-right
+- Position: absolute top-right inside notification card
+- Show only on hover (clean UI)
+- Smooth fade-in animation
+
+---
+
+4. Manual Delete Logic
+
+On clicking ❌:
+
+- Remove that notification from state
+- Update localStorage instantly
+- Update UI immediately
+
+Example:
+notifications = notifications.filter(n => n.id !== clickedId);
+
+---
+
+5. Prevent Click Conflict
+
+IMPORTANT:
+
+- Clicking ❌ should NOT trigger notification open
+- Use event.stopPropagation()
+
+---
+
+6. Empty State Handling
+
+If no notifications:
+
+Show:
+✔ "You're all caught up"
+✔ No error / blank screen
+
+---
+
+7. Unread Count Update
+
+After deletion:
+
+- Recalculate unread count
+- Update bell icon badge
+
+---
+
+8. Performance Optimization
+
+- Run auto-delete only:
+  ✔ On page load
+  ✔ Not on every render
+
+---
+
+9. UI Polish (Premium Feel)
+
+- Hover → slight glow
+- Delete icon → subtle red hover effect
+- Smooth remove animation (fade + slide up)
+
+---
+
+10. Final Behavior
+
+✔ Old notifications auto removed (7 days)  
+✔ User can manually delete  
+✔ UI stays clean  
+✔ No unnecessary clutter  
+✔ State persists after refresh  
+
+---
+
+DO NOT:
+- Keep expired notifications in memory
+- Hardcode time logic
+- Break existing read/unread system
