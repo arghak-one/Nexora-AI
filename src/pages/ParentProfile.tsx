@@ -8,7 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import type { Parent } from "./Parents";
+import type { Parent } from "@/lib/store";
 
 const STORAGE_KEY = "nexora_parents";
 
