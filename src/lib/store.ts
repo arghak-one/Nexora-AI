@@ -90,6 +90,76 @@ export interface BehaviourRecord {
   updatedAt?: number;
 }
 
+export type PaymentMethod = "UPI" | "Card" | "Cash" | "Bank Transfer";
+export type FeeStatus = "Paid" | "Partial" | "Unpaid";
+
+export interface FeePayment {
+  id: string;
+  amount: number;
+  date: string;
+  method: PaymentMethod;
+}
+
+export interface FeeStructure {
+  id: string;
+  department: string;
+  course: string;
+  semester: string;
+  tuitionFee: number;
+  examFee: number;
+  libraryFee: number;
+  labFee: number;
+  hostelFee: number;
+  otherCharges: number;
+  total: number;
+}
+
+export interface StudentFeeRecord {
+  id: string;
+  studentName: string;
+  department: string;
+  course: string;
+  semester: string;
+  totalFee: number;
+  paidAmount: number;
+  dueAmount: number;
+  scholarship: number;
+  status: FeeStatus;
+  payments: FeePayment[];
+  isNew?: boolean;
+}
+
+export const departments = ["CSE", "ECE", "BBA", "MBA", "Mechanical", "Civil"];
+export const courses: Record<string, string[]> = {
+  CSE: ["B.Tech", "M.Tech"],
+  ECE: ["B.Tech", "M.Tech"],
+  BBA: ["BBA"],
+  MBA: ["MBA"],
+  Mechanical: ["B.Tech", "M.Tech"],
+  Civil: ["B.Tech"],
+};
+export const semesters = ["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8"];
+export const paymentMethods: PaymentMethod[] = ["UPI", "Card", "Cash", "Bank Transfer"];
+
+export const defaultFeeStructures: FeeStructure[] = [
+  { id: "fs1", department: "CSE", course: "B.Tech", semester: "Sem 1", tuitionFee: 60000, examFee: 5000, libraryFee: 3000, labFee: 8000, hostelFee: 15000, otherCharges: 4000, total: 95000 },
+  { id: "fs2", department: "CSE", course: "B.Tech", semester: "Sem 2", tuitionFee: 60000, examFee: 5000, libraryFee: 3000, labFee: 8000, hostelFee: 15000, otherCharges: 4000, total: 95000 },
+  { id: "fs3", department: "ECE", course: "B.Tech", semester: "Sem 1", tuitionFee: 55000, examFee: 5000, libraryFee: 3000, labFee: 7000, hostelFee: 15000, otherCharges: 3000, total: 88000 },
+  { id: "fs4", department: "BBA", course: "BBA", semester: "Sem 1", tuitionFee: 40000, examFee: 4000, libraryFee: 2000, labFee: 0, hostelFee: 12000, otherCharges: 2000, total: 60000 },
+  { id: "fs5", department: "MBA", course: "MBA", semester: "Sem 1", tuitionFee: 80000, examFee: 6000, libraryFee: 4000, labFee: 2000, hostelFee: 18000, otherCharges: 5000, total: 115000 },
+];
+
+export const defaultStudentFees: StudentFeeRecord[] = [
+  { id: "sf1", studentName: "Rahul Kumar", department: "CSE", course: "B.Tech", semester: "Sem 3", totalFee: 95000, paidAmount: 95000, dueAmount: 0, scholarship: 0, status: "Paid", payments: [{ id: "p1", amount: 50000, date: "2026-01-15", method: "Bank Transfer" }, { id: "p2", amount: 45000, date: "2026-02-10", method: "UPI" }] },
+  { id: "sf2", studentName: "Priya Sharma", department: "CSE", course: "B.Tech", semester: "Sem 3", totalFee: 95000, paidAmount: 60000, dueAmount: 25000, scholarship: 10000, status: "Partial", payments: [{ id: "p3", amount: 60000, date: "2026-01-20", method: "Card" }] },
+  { id: "sf3", studentName: "Amit Patel", department: "ECE", course: "B.Tech", semester: "Sem 1", totalFee: 88000, paidAmount: 88000, dueAmount: 0, scholarship: 0, status: "Paid", payments: [{ id: "p4", amount: 88000, date: "2026-01-05", method: "Bank Transfer" }] },
+  { id: "sf4", studentName: "Vikram Singh", department: "ECE", course: "B.Tech", semester: "Sem 1", totalFee: 88000, paidAmount: 0, dueAmount: 88000, scholarship: 0, status: "Unpaid", payments: [] },
+  { id: "sf5", studentName: "Sneha Gupta", department: "BBA", course: "BBA", semester: "Sem 1", totalFee: 60000, paidAmount: 60000, dueAmount: 0, scholarship: 5000, status: "Paid", payments: [{ id: "p5", amount: 55000, date: "2026-01-12", method: "UPI" }] },
+  { id: "sf6", studentName: "Rohan Mehta", department: "MBA", course: "MBA", semester: "Sem 1", totalFee: 115000, paidAmount: 50000, dueAmount: 65000, scholarship: 0, status: "Partial", payments: [{ id: "p6", amount: 50000, date: "2026-02-01", method: "Cash" }] },
+  { id: "sf7", studentName: "Ananya Das", department: "CSE", course: "M.Tech", semester: "Sem 1", totalFee: 95000, paidAmount: 0, dueAmount: 95000, scholarship: 15000, status: "Unpaid", payments: [] },
+  { id: "sf8", studentName: "Kavita Reddy", department: "Mechanical", course: "B.Tech", semester: "Sem 5", totalFee: 90000, paidAmount: 90000, dueAmount: 0, scholarship: 0, status: "Paid", payments: [{ id: "p7", amount: 45000, date: "2026-01-08", method: "Card" }, { id: "p8", amount: 45000, date: "2026-02-08", method: "Card" }] },
+];
+
 // Default Data
 export const defaultStudents: Student[] = [
   { id: 1, name: "Rahul Kumar", class: "10A", attendance: 95, marks: 88, risk: "Low", aiScore: 9.2 },
