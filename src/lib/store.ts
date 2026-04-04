@@ -282,6 +282,12 @@ export const store = {
 
   getBehaviours: () => loadData<BehaviourRecord[]>("nexora_behaviours", defaultBehaviours),
   setBehaviours: (data: BehaviourRecord[]) => saveData("nexora_behaviours", data),
+
+  getFeeStructures: () => loadData<FeeStructure[]>("nexora_fee_structures", defaultFeeStructures),
+  setFeeStructures: (data: FeeStructure[]) => saveData("nexora_fee_structures", data),
+
+  getStudentFees: () => loadData<StudentFeeRecord[]>("nexora_student_fees", defaultStudentFees),
+  setStudentFees: (data: StudentFeeRecord[]) => saveData("nexora_student_fees", data),
 };
 
 // React Hook
