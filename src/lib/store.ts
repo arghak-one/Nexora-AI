@@ -77,12 +77,19 @@ export interface ReportRecord {
   updatedAt?: number;
 }
 
+export type BehaviourSeverity = "low" | "medium" | "high";
+export type BehaviourTag = "late" | "discipline" | "leadership" | "participation" | "homework" | "bullying" | "respect" | "teamwork" | "cheating" | "improvement";
+
+export const behaviourTags: BehaviourTag[] = ["late", "discipline", "leadership", "participation", "homework", "bullying", "respect", "teamwork", "cheating", "improvement"];
+
 export interface BehaviourRecord {
   id: string;
   studentName: string;
   class: string;
   type: "warning" | "concern" | "positive";
+  severity: BehaviourSeverity;
   description: string;
+  tags: BehaviourTag[];
   date: string;
   reportedBy: string;
   frequency?: number;
