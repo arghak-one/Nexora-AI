@@ -235,12 +235,16 @@ export const defaultReports: ReportRecord[] = [
 ];
 
 export const defaultBehaviours: BehaviourRecord[] = [
-  { id: "b1", studentName: "Vikram Singh", class: "10B", type: "warning", description: "Repeated late arrivals — 5 times this month", date: "Today", reportedBy: "Mr. Sharma", frequency: 5 },
-  { id: "b2", studentName: "Priya Sharma", class: "10A", type: "concern", description: "Declining participation in class discussions", date: "Yesterday", reportedBy: "Mrs. Gupta", frequency: 2 },
-  { id: "b3", studentName: "Rahul Kumar", class: "10A", type: "positive", description: "Excellent leadership during group project", date: "2 days ago", reportedBy: "Mr. Davis", frequency: 1 },
-  { id: "b4", studentName: "Rohan Mehta", class: "9A", type: "positive", description: "Consistent improvement in homework submissions", date: "3 days ago", reportedBy: "Ms. Lee", frequency: 4 },
-  { id: "b5", studentName: "Kavita Reddy", class: "10A", type: "concern", description: "Showing signs of disengagement in Physics class", date: "4 days ago", reportedBy: "Dr. Singh", frequency: 3 },
-  { id: "b6", studentName: "Amit Patel", class: "10B", type: "positive", description: "Helped peer tutoring sessions voluntarily", date: "5 days ago", reportedBy: "Mr. Sharma", frequency: 1 },
+  { id: "b1", studentName: "Vikram Singh", class: "10B", type: "warning", severity: "high", tags: ["late", "discipline"], description: "Repeated late arrivals — 5 times this month", date: "2026-04-05", reportedBy: "Mr. Sharma", frequency: 5, createdAt: Date.now() - 0 },
+  { id: "b2", studentName: "Priya Sharma", class: "10A", type: "concern", severity: "medium", tags: ["participation"], description: "Declining participation in class discussions", date: "2026-04-04", reportedBy: "Mrs. Gupta", frequency: 2, createdAt: Date.now() - 86400000 },
+  { id: "b3", studentName: "Rahul Kumar", class: "10A", type: "positive", severity: "low", tags: ["leadership", "teamwork"], description: "Excellent leadership during group project", date: "2026-04-03", reportedBy: "Mr. Davis", frequency: 1, createdAt: Date.now() - 172800000 },
+  { id: "b4", studentName: "Rohan Mehta", class: "9A", type: "positive", severity: "low", tags: ["homework", "improvement"], description: "Consistent improvement in homework submissions", date: "2026-04-02", reportedBy: "Ms. Lee", frequency: 4, createdAt: Date.now() - 259200000 },
+  { id: "b5", studentName: "Kavita Reddy", class: "10A", type: "concern", severity: "medium", tags: ["participation", "discipline"], description: "Showing signs of disengagement in Physics class", date: "2026-04-01", reportedBy: "Dr. Singh", frequency: 3, createdAt: Date.now() - 345600000 },
+  { id: "b6", studentName: "Amit Patel", class: "10B", type: "positive", severity: "low", tags: ["teamwork", "respect"], description: "Helped peer tutoring sessions voluntarily", date: "2026-03-31", reportedBy: "Mr. Sharma", frequency: 1, createdAt: Date.now() - 432000000 },
+  { id: "b7", studentName: "Vikram Singh", class: "10B", type: "warning", severity: "high", tags: ["discipline", "cheating"], description: "Caught using phone during exam", date: "2026-04-03", reportedBy: "Ms. Priya Jain", frequency: 1, createdAt: Date.now() - 172800000 },
+  { id: "b8", studentName: "Vikram Singh", class: "10B", type: "warning", severity: "medium", tags: ["discipline", "homework"], description: "Did not submit homework for 3rd consecutive time", date: "2026-04-02", reportedBy: "Mr. Anil Das", frequency: 3, createdAt: Date.now() - 259200000 },
+  { id: "b9", studentName: "Priya Sharma", class: "10A", type: "concern", severity: "low", tags: ["participation"], description: "Seems withdrawn during group activities", date: "2026-04-02", reportedBy: "Mr. Davis", frequency: 1, createdAt: Date.now() - 259200000 },
+  { id: "b10", studentName: "Rohan Mehta", class: "9A", type: "positive", severity: "low", tags: ["leadership", "participation"], description: "Led the science fair team to first place", date: "2026-04-04", reportedBy: "Mrs. Kavita Rao", frequency: 1, createdAt: Date.now() - 86400000 },
 ];
 
 // Event Emitter
