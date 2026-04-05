@@ -1,77 +1,165 @@
-import { useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import StatCard from "@/components/StatCard";
 import PerformanceChart from "@/components/PerformanceChart";
-import SubjectProgress from "@/components/SubjectProgress";
 import RecentActivity from "@/components/RecentActivity";
 import AIInsights from "@/components/AIInsights";
-import { CalendarCheck, BarChart3, Brain, ShieldAlert, Users, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
+import SubjectProgress from "@/components/SubjectProgress";
+import {
+  CalendarCheck, BarChart3, Brain, ShieldAlert,
+  Users, DollarSign, TrendingUp, AlertTriangle, RefreshCw,
+} from "lucide-react";
 import { store } from "@/lib/store";
 
-// ─── Pull live data from store ────────────────────────────────────────────────
-function getLiveStats() {
+// ─── Types ────────────────────────────────────────────────────────────────────
+interface LiveStats {
+  avgAttendance: number;
+  avgMarks: number;
+  avgAI: number;
+  highRisk: number;
+  medRisk: number;
+  flagged: number;
+  riskLabel: "Low" | "Medium" | "High";
+  totalCollected: number;
+  unpaidFees: number;
+  partialFees: number;
+  totalStudents: number;
+  totalTeachers: number;
+  passRate: number;
+  topScore: number;
+}
+
+// ─── Compute live stats from localStorage ─────────────────────────────────────
+function computeStats(): LiveStats {
   const students = store.getStudents();
   const results  = store.getResults();
   const fees     = store.getStudentFees ? store.getStudentFees() : [];
+  const teachers = store.getTeachers ? store.getTeachers() : [];
 
-  // Attendance rate from students
   const avgAttendance = students.length
     ? Math.round(students.reduce((s, st) => s + (st.attendance ?? 0), 0) / students.length * 10) / 10
     : 0;
 
-  // Average marks from results
   const avgMarks = results.length
     ? Math.round(results.reduce((s, r) => s + r.percentage, 0) / results.length * 10) / 10
     : 0;
 
-  // AI score from students
   const avgAI = students.length
     ? Math.round(students.reduce((s, st) => s + (st.aiScore ?? 0), 0) / students.length * 10) / 10
     : 0;
 
-  // High-risk students
   const highRisk = students.filter((s) => s.risk === "High").length;
   const medRisk  = students.filter((s) => s.risk === "Medium").length;
 
-  // Fee stats
   const totalCollected = fees.reduce((s: number, f: any) => s + (f.paidAmount ?? 0), 0);
   const unpaidFees     = fees.filter((f: any) => f.status === "Unpaid").length;
+  const partialFees    = fees.filter((f: any) => f.status === "Partial").length;
 
-  // Risk level label
-  const riskLabel = highRisk === 0 ? "Low" : highRisk <= 2 ? "Medium" : "High";
-  const flagged   = highRisk + medRisk;
+  const riskLabel =
+    highRisk === 0 ? "Low"
+    : highRisk <= 2 ? "Medium"
+    : "High";
 
-  return { avgAttendance, avgMarks, avgAI, highRisk, medRisk, flagged, riskLabel, totalCollected, unpaidFees, totalStudents: students.length };
+  const passRate = results.length
+    ? Math.round(results.filter((r) => r.status === "Pass").length / results.length * 100)
+    : 0;
+
+  const topScore = results.length ? Math.max(...results.map((r) => r.percentage)) : 0;
+
+  return {
+    avgAttendance, avgMarks, avgAI, highRisk, medRisk,
+    flagged: highRisk + medRisk, riskLabel,
+    totalCollected, unpaidFees, partialFees,
+    totalStudents: students.length, totalTeachers: teachers.length,
+    passRate, topScore,
+  };
 }
 
-const formatMoney = (n: number) => {
+const fmt = (n: number) => {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
   if (n >= 1000)   return `₹${(n / 1000).toFixed(1)}K`;
   return `₹${n}`;
 };
 
-const riskColor = (label: string) => {
-  if (label === "High")   return "bg-destructive/10 text-destructive";
-  if (label === "Medium") return "bg-warning/10 text-warning";
-  return "bg-success/10 text-success";
-};
+// ─── Mini KPI Card (secondary row) ───────────────────────────────────────────
+const MiniCard = ({
+  icon: Icon, value, label, gradient, glow,
+}: { icon: React.ElementType; value: string; label: string; gradient: string; glow: string }) => (
+  <div className={`glass rounded-2xl p-4 ${glow} hover:scale-[1.02] transition-all duration-200 cursor-default`}>
+    <div className="flex items-center gap-3">
+      <div className={`w-9 h-9 rounded-xl ${gradient} flex items-center justify-center shrink-0`}>
+        <Icon className="w-4 h-4 text-foreground" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xl font-bold text-foreground leading-tight truncate">{value}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{label}</p>
+      </div>
+    </div>
+  </div>
+);
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const Dashboard = () => {
-  const stats = useMemo(() => getLiveStats(), []);
+  // Tick state — bumped every time we want to recompute stats
+  const [tick, setTick] = useState(0);
+
+  // Recompute whenever tick changes (covers manual refresh + storage events)
+  const stats = useMemo(() => computeStats(), [tick]);
+
+  // Re-read from localStorage when user navigates back to this tab
+  useEffect(() => {
+    const refresh = () => setTick((t) => t + 1);
+
+    // Storage event fires when ANOTHER tab writes to localStorage
+    window.addEventListener("storage", refresh);
+    // Visibility change fires when user switches back to this tab
+    document.addEventListener("visibilitychange", refresh);
+
+    return () => {
+      window.removeEventListener("storage", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
+
+  const handleRefresh = useCallback(() => setTick((t) => t + 1), []);
+
+  // ── Derived UI helpers ─────────────────────────────────────────────────────
+  const riskCardColor =
+    stats.riskLabel === "High"   ? "text-destructive" :
+    stats.riskLabel === "Medium" ? "text-warning" : "text-success";
+
+  const attendanceTrend = stats.avgAttendance >= 90 ? "✓ On Target" : stats.avgAttendance >= 75 ? "⚠ Needs Work" : "✕ Critical";
+  const marksTrend      = stats.avgMarks >= 75 ? "✓ Above Target" : stats.avgMarks >= 50 ? "⚠ Below Target" : "✕ Critical";
+  const aiTrend         = stats.avgAI >= 7 ? "✓ On Track" : stats.avgAI >= 5 ? "⚠ Average" : "✕ Low";
 
   return (
     <DashboardLayout>
       <div className="space-y-6 animate-fade-in">
 
-        {/* Top KPI row */}
+        {/* ── Page Header ── */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Live overview — updates automatically from all modules</p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground glass px-3 py-2 rounded-xl transition-all hover:scale-105"
+            title="Refresh stats"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Refresh
+          </button>
+        </div>
+
+        {/* ── Primary KPI Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Attendance Rate"
             value={`${stats.avgAttendance}%`}
             icon={CalendarCheck}
-            trend={stats.avgAttendance >= 90 ? "+Good" : "Needs attention"}
-            trendUp={stats.avgAttendance >= 90}
+            trend={attendanceTrend}
+            trendUp={stats.avgAttendance >= 75}
             glowClass="glow-primary"
             gradientClass="gradient-primary"
           />
@@ -79,7 +167,7 @@ const Dashboard = () => {
             title="Average Marks"
             value={`${stats.avgMarks}%`}
             icon={BarChart3}
-            trend={stats.avgMarks >= 75 ? "Above target" : "Below target"}
+            trend={marksTrend}
             trendUp={stats.avgMarks >= 75}
             glowClass="glow-accent"
             gradientClass="gradient-warm"
@@ -88,7 +176,7 @@ const Dashboard = () => {
             title="AI Performance Score"
             value={`${stats.avgAI}/10`}
             icon={Brain}
-            trend={stats.avgAI >= 7 ? "On track" : "Review needed"}
+            trend={aiTrend}
             trendUp={stats.avgAI >= 7}
             glowClass="glow-teal"
             gradientClass="gradient-teal"
@@ -103,72 +191,47 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Secondary KPIs */}
+        {/* ── Secondary KPI Row ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass rounded-2xl p-4 glow-primary hover:scale-[1.02] transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl gradient-teal flex items-center justify-center">
-                <Users className="w-4 h-4 text-foreground" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{stats.totalStudents}</p>
-                <p className="text-xs text-muted-foreground">Total Students</p>
-              </div>
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-4 glow-teal hover:scale-[1.02] transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-foreground" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{formatMoney(stats.totalCollected)}</p>
-                <p className="text-xs text-muted-foreground">Fees Collected</p>
-              </div>
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-4 glow-accent hover:scale-[1.02] transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl gradient-warm flex items-center justify-center">
-                <AlertTriangle className="w-4 h-4 text-foreground" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{stats.unpaidFees}</p>
-                <p className="text-xs text-muted-foreground">Unpaid Fees</p>
-              </div>
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-4 glow-primary hover:scale-[1.02] transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl gradient-teal flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-foreground" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{stats.highRisk}</p>
-                <p className="text-xs text-muted-foreground">High Risk</p>
-              </div>
-            </div>
-          </div>
+          <MiniCard icon={Users}        value={String(stats.totalStudents)}      label="Total Students"   gradient="gradient-teal"    glow="glow-teal" />
+          <MiniCard icon={DollarSign}   value={fmt(stats.totalCollected)}         label="Fees Collected"   gradient="gradient-primary" glow="glow-primary" />
+          <MiniCard icon={AlertTriangle} value={String(stats.unpaidFees)}         label="Unpaid Fees"      gradient="gradient-warm"    glow="glow-accent" />
+          <MiniCard icon={TrendingUp}   value={`${stats.passRate}%`}              label="Overall Pass Rate" gradient="gradient-teal"   glow="glow-teal" />
         </div>
 
-        {/* Alert Banner — only if high-risk students exist */}
+        {/* ── Alert Banners ── */}
         {stats.highRisk > 0 && (
-          <div className="glass rounded-2xl p-4 border border-destructive/30 glow-primary flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
+          <div className="glass rounded-2xl p-4 border border-destructive/30 flex items-start gap-3 animate-fade-in">
+            <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0 mt-0.5">
               <AlertTriangle className="w-5 h-5 text-destructive" />
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">
-                {stats.highRisk} high-risk student{stats.highRisk !== 1 ? "s" : ""} need immediate attention
+                🚨 {stats.highRisk} high-risk student{stats.highRisk !== 1 ? "s" : ""} need immediate attention
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Low attendance or poor performance detected. Review in Students section.
+                Low attendance or critical marks detected. Go to <strong>Students</strong> to review and take action.
+              </p>
+            </div>
+          </div>
+        )}
+        {stats.unpaidFees > 0 && (
+          <div className="glass rounded-2xl p-4 border border-warning/30 flex items-start gap-3 animate-fade-in">
+            <div className="w-9 h-9 rounded-xl bg-warning/10 flex items-center justify-center shrink-0 mt-0.5">
+              <DollarSign className="w-5 h-5 text-warning" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                💰 {stats.unpaidFees} unpaid + {stats.partialFees} partial fee{(stats.unpaidFees + stats.partialFees) !== 1 ? "s" : ""} pending
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Follow up with students or parents. Review in the <strong>Fees</strong> module.
               </p>
             </div>
           </div>
         )}
 
-        {/* Charts */}
+        {/* ── Charts Row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <PerformanceChart />
@@ -176,11 +239,12 @@ const Dashboard = () => {
           <SubjectProgress />
         </div>
 
-        {/* Activity & Insights */}
+        {/* ── Activity & Insights ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <RecentActivity />
           <AIInsights />
         </div>
+
       </div>
     </DashboardLayout>
   );
