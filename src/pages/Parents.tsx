@@ -220,7 +220,8 @@ const Parents = () => {
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Class</th>
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Phone</th>
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Email</th>
-                  <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Actions</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Risk</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">Quick Actions</th>
                 </tr>
               </thead>
               <tbody>
