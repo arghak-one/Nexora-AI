@@ -257,34 +257,67 @@ const Parents = () => {
                       <td className="px-5 py-4 text-sm text-muted-foreground" onClick={() => navigate(`/parents/${parent.id}`)}>{parent.class}</td>
                       <td className="px-5 py-4 text-sm text-muted-foreground" onClick={() => navigate(`/parents/${parent.id}`)}>{parent.phone}</td>
                       <td className="px-5 py-4 text-sm text-muted-foreground" onClick={() => navigate(`/parents/${parent.id}`)}>{parent.email}</td>
+                      <td className="px-5 py-4">
+                        {(() => {
+                          const student = students.find(s => s.name === parent.studentName);
+                          const attendance = student?.attendance ?? 85;
+                          const marks = student?.marks ?? 75;
+                          const risk = attendance < 60 ? "High" : marks < 70 ? "Medium" : "Low";
+                          const colors = {
+                            High: "bg-destructive/15 text-destructive border-destructive/30",
+                            Medium: "bg-[hsl(40,90%,50%)]/15 text-[hsl(40,90%,45%)] border-[hsl(40,90%,50%)]/30",
+                            Low: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+                          };
+                          return (
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-semibold ${colors[risk]}`}>
+                              {risk}
+                            </span>
+                          );
+                        })()}
+                      </td>
                       <td className="px-4 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <TooltipProvider delayDuration={200}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  data-testid={`button-edit-parent-${parent.id}`}
-                                  onClick={(e) => { e.stopPropagation(); openEditModal(parent); }}
-                                  className="p-2 rounded-[10px] text-muted-foreground/80 bg-secondary/40 hover:text-primary hover:bg-primary/15 hover:shadow-[0_0_12px_-3px_hsl(var(--primary)/0.4)] transition-all duration-200"
-                                >
-                                  <Pencil className="w-3.5 h-3.5" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="text-xs">Edit Parent</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  data-testid={`button-delete-parent-${parent.id}`}
-                                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(parent); }}
-                                  className="p-2 rounded-[10px] text-muted-foreground/80 bg-secondary/40 hover:text-destructive hover:bg-destructive/15 hover:shadow-[0_0_12px_-3px_hsl(var(--destructive)/0.4)] transition-all duration-200"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="text-xs">Delete Parent</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-2 rounded-[10px] text-muted-foreground/80 bg-secondary/40 hover:text-foreground hover:bg-secondary/80 transition-all duration-200"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48 glass-strong border-border/50 rounded-xl">
+                              <DropdownMenuItem
+                                onClick={() => navigate(`/parents/${parent.id}`)}
+                                className="gap-2 cursor-pointer rounded-lg"
+                              >
+                                <Eye className="w-4 h-4 text-primary" /> View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  const student = students.find(s => s.name === parent.studentName);
+                                  if (student) navigate(`/students/${student.id || student.name}`);
+                                  else toast({ title: "Student not found", variant: "destructive" });
+                                }}
+                                className="gap-2 cursor-pointer rounded-lg"
+                              >
+                                <BarChart3 className="w-4 h-4 text-emerald-400" /> View Child Performance
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator className="bg-border/30" />
+                              <DropdownMenuItem
+                                onClick={() => toast({ title: "Message Sent", description: `Notification sent to ${parent.parentName}.` })}
+                                className="gap-2 cursor-pointer rounded-lg"
+                              >
+                                <MessageSquare className="w-4 h-4 text-blue-400" /> Send Message
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => toast({ title: "Meeting Scheduled", description: `Meeting request sent to ${parent.parentName}.` })}
+                                className="gap-2 cursor-pointer rounded-lg"
+                              >
+                                <CalendarClock className="w-4 h-4 text-purple-400" /> Schedule Meeting
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </td>
                     </tr>
