@@ -1,6 +1,6 @@
 import { StrictModal } from "@/components/StrictModal";
 import { Button } from "@/components/ui/button";
-import { X, Save, AlertTriangle, ShieldAlert, ThumbsUp } from "lucide-react";
+import { X, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import { BehaviourRecord } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
