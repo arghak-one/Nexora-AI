@@ -11,6 +11,7 @@ import {
   DollarSign,
   FileText,
   UserCheck,
+  Building2,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -74,6 +75,7 @@ const sections: Section[] = [
     label: "Management",
     items: [
       { title: "Fees", url: "/fees", icon: DollarSign },
+      { title: "Departments", url: "/departments", icon: Building2 },
       { title: "Reports", url: "/reports", icon: FileText },
       { title: "Parents", url: "/parents", icon: UserCheck },
     ],

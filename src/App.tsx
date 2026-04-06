@@ -15,6 +15,7 @@ import Behaviour from "./pages/Behaviour.tsx";
 import Analytics from "./pages/Analytics.tsx";
 import AIInsightsPage from "./pages/AIInsightsPage.tsx";
 import Fees from "./pages/Fees.tsx";
+import Departments from "./pages/Departments.tsx";
 import Reports from "./pages/Reports.tsx";
 import Parents from "./pages/Parents.tsx";
 import ParentProfile from "./pages/ParentProfile.tsx";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/ai-insights" element={<AIInsightsPage />} />
           <Route path="/fees" element={<Fees />} />
+          <Route path="/departments" element={<Departments />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/parents" element={<Parents />} />
           <Route path="/parents/:id" element={<ParentProfile />} />
