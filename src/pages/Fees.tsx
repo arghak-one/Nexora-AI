@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { toast } from "@/hooks/use-toast";
 import {
   store, StudentFeeRecord, FeePayment, FeeStatus, PaymentMethod,
-  departments, courses, semesters, paymentMethods, useStoreUpdate
+  courses, semesters, paymentMethods, useStoreUpdate
 } from "@/lib/store";
 
 const statusColors: Record<FeeStatus, string> = {
@@ -40,6 +40,7 @@ type ViewMode = "table" | "detail";
 
 const Fees = () => {
   useStoreUpdate();
+  const dynamicDepartments = store.getDepartments().map((d) => d.name);
   const [fees, setFees] = useState<StudentFeeRecord[]>(() => store.getStudentFees());
   const [search, setSearch] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
@@ -193,7 +194,7 @@ const Fees = () => {
     setViewMode("detail");
   };
 
-  const availableCourses = formDept ? (courses[formDept] || []) : [];
+  const availableCourses = formDept ? (courses[formDept] || [formCourse].filter(Boolean)) : [];
 
   // ── DETAIL VIEW ──
   if (viewMode === "detail" && selectedFee) {
@@ -395,7 +396,7 @@ const Fees = () => {
             <SelectTrigger className="w-[130px] glass border-border/50 rounded-xl"><SelectValue placeholder="Department" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Depts</SelectItem>
-              {departments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              {dynamicDepartments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={courseFilter} onValueChange={setCourseFilter}>
@@ -504,7 +505,7 @@ const Fees = () => {
                 <Label className="text-sm text-muted-foreground">Department</Label>
                 <Select value={formDept} onValueChange={(v) => { setFormDept(v); setFormCourse(courses[v]?.[0] || ""); }}>
                   <SelectTrigger className="glass border-border/50 rounded-xl"><SelectValue /></SelectTrigger>
-                  <SelectContent>{departments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                  <SelectContent>{dynamicDepartments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
