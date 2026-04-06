@@ -7,7 +7,31 @@ import { store, ReportRecord, useStoreUpdate } from "@/lib/store";
 import { ReportPreviewModal } from "@/components/ReportPreviewModal";
 import { EditReportModal } from "@/components/EditReportModal";
 import { ConfirmDeleteModal } from "@/components/ConfirmDeleteModal";
+import { CreateReportModal } from "@/components/CreateReportModal";
 import { toast } from "@/hooks/use-toast";
+
+function generateAIContent(category: string): string {
+  const students = store.getStudents();
+  const behaviours = store.getBehaviours();
+  const now = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+  const avgAttendance = students.length ? Math.round(students.reduce((s, st) => s + (st.attendance ?? 0), 0) / students.length) : 0;
+  const avgMarks = students.length ? Math.round(students.reduce((s, st) => s + (st.marks ?? 0), 0) / students.length) : 0;
+  const highRisk = students.filter(s => (s.attendance ?? 100) < 75 || (s.marks ?? 100) < 40).length;
+  const warnings = behaviours.filter(b => b.type === "warning").length;
+  const positives = behaviours.filter(b => b.type === "positive").length;
+
+  const sections: Record<string, string> = {
+    Performance: `Performance Report — ${now}\n\nTotal Students: ${students.length}\nAverage Marks: ${avgMarks}%\nHigh-Risk Students: ${highRisk}\n\nTop Performers: ${students.filter(s => (s.marks ?? 0) >= 85).map(s => s.name).join(", ") || "None"}\n\nStudents Needing Attention: ${students.filter(s => (s.marks ?? 0) < 40).map(s => s.name).join(", ") || "None"}\n\nThis report was auto-generated based on the latest grade data across all enrolled students.`,
+    Attendance: `Attendance Report — ${now}\n\nTotal Students: ${students.length}\nAverage Attendance: ${avgAttendance}%\n\nPerfect Attendance: ${students.filter(s => (s.attendance ?? 0) >= 95).length} students\nBelow 75%: ${students.filter(s => (s.attendance ?? 0) < 75).map(s => `${s.name} (${s.attendance}%)`).join(", ") || "None"}\n\nRecommendation: ${avgAttendance < 80 ? "Attendance levels are concerning. Immediate intervention recommended." : "Attendance levels are satisfactory."}`,
+    Behaviour: `Behaviour Report — ${now}\n\nTotal Incidents Logged: ${behaviours.length}\nWarnings: ${warnings}\nPositive Notes: ${positives}\n\nRecent Warnings: ${behaviours.filter(b => b.type === "warning").slice(0, 3).map(b => `${b.studentName} — ${b.description}`).join("; ") || "None"}\n\nOverall Trend: ${positives > warnings ? "Improving" : warnings > positives ? "Declining — action required" : "Stable"}`,
+    Financial: `Financial Summary — ${now}\n\nThis report summarises fee collection status across all departments. Overall collection rates, outstanding dues, and scholarship distributions are included.\n\nNote: Connect to the Fees module for live data integration.`,
+    Academic: `Academic Overview — ${now}\n\nTotal Students: ${students.length}\nAverage Score: ${avgMarks}%\nPass Rate: ${students.length ? Math.round((students.filter(s => (s.marks ?? 0) >= 40).length / students.length) * 100) : 0}%\n\nGrade Distribution:\n  A (85%+): ${students.filter(s => (s.marks ?? 0) >= 85).length}\n  B (70-84%): ${students.filter(s => { const m = s.marks ?? 0; return m >= 70 && m < 85; }).length}\n  C (50-69%): ${students.filter(s => { const m = s.marks ?? 0; return m >= 50 && m < 70; }).length}\n  Below 50%: ${students.filter(s => (s.marks ?? 0) < 50).length}`,
+    Administrative: `Administrative Report — ${now}\n\nSystem Overview:\n  Students Enrolled: ${students.length}\n  Behaviour Logs: ${behaviours.length}\n  Reports Generated: ${store.getReports().length + 1}\n\nThis report provides a snapshot of institutional metrics for administrative review.`,
+  };
+
+  return sections[category] || sections["Administrative"];
+}
 
 const Reports = () => {
   useStoreUpdate();
@@ -17,6 +41,7 @@ const Reports = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<ReportRecord | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   useEffect(() => {
     setReports(store.getReports());
@@ -47,48 +72,58 @@ const Reports = () => {
       document.body.removeChild(link);
       return;
     }
-
     const doc = new jsPDF();
-
     doc.setFontSize(18);
     doc.text(report.title, 20, 20);
-
     doc.setFontSize(12);
     doc.text(`Type: ${report.type}`, 20, 30);
     doc.text(`Date: ${report.date}`, 20, 40);
-
     doc.setLineWidth(0.5);
     doc.line(20, 45, 190, 45);
-
     doc.setFontSize(11);
     doc.text("Summary:", 20, 55);
-
-    const splitText = doc.splitTextToSize(
-      report.content || "Sample report content",
-      170
-    );
-
+    const splitText = doc.splitTextToSize(report.content || "Sample report content", 170);
     doc.text(splitText, 20, 65);
-
     doc.save(`${report.title}.pdf`);
   };
 
-  const handleGenerateReport = () => {
+  const handleCreateAI = async (category: string) => {
+    // Simulate brief generation delay
+    await new Promise(r => setTimeout(r, 1200));
+    const content = generateAIContent(category);
     const newReport: ReportRecord = {
       id: "r" + Date.now(),
-      title: "New AI Generated Report",
-      type: "System",
+      title: `${category} Report — AI Generated`,
+      type: category,
       date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      size: "24 KB",
+      size: `${Math.round(content.length / 40)} KB`,
       fileUrl: null,
-      content: "This is a dynamically generated report detailing recent AI insights, attendance metrics, and grade predictions. The system automatically drafted this summary based on the latest metrics gathered across all student dashboards.",
+      content,
       createdAt: Date.now(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     };
-    
-    const updatedReports = [newReport, ...store.getReports()];
-    setReports(updatedReports);
-    store.setReports(updatedReports);
+    const updated = [newReport, ...store.getReports()];
+    setReports(updated);
+    store.setReports(updated);
+    toast({ title: "Report Generated", description: `${category} report created successfully.` });
+  };
+
+  const handleCreateManual = (data: { title: string; type: string; content: string }) => {
+    const newReport: ReportRecord = {
+      id: "r" + Date.now(),
+      title: data.title,
+      type: data.type,
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      size: `${Math.round(data.content.length / 40)} KB`,
+      fileUrl: null,
+      content: data.content,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    const updated = [newReport, ...store.getReports()];
+    setReports(updated);
+    store.setReports(updated);
+    toast({ title: "Report Created", description: "Manual report saved successfully." });
   };
 
   const handleSaveEdit = (updatedReport: ReportRecord) => {
@@ -116,7 +151,7 @@ const Reports = () => {
             <h1 className="text-2xl font-bold text-foreground">Reports</h1>
             <p className="text-sm text-muted-foreground">Generated reports and documents</p>
           </div>
-          <Button onClick={handleGenerateReport} className="gradient-primary text-foreground glow-primary gap-2">
+          <Button onClick={() => setIsCreateOpen(true)} className="gradient-primary text-foreground glow-primary gap-2">
             <Plus className="w-4 h-4" />
             Generate New Report
           </Button>
@@ -181,6 +216,13 @@ const Reports = () => {
         onClose={() => setIsDeleteOpen(false)}
         reportTitle={reportToDelete?.title}
         onConfirm={handleConfirmDelete}
+      />
+
+      <CreateReportModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onCreateManual={handleCreateManual}
+        onCreateAI={handleCreateAI}
       />
     </DashboardLayout>
   );
