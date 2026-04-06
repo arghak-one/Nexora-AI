@@ -136,6 +136,22 @@ export interface StudentFeeRecord {
   isNew?: boolean;
 }
 
+export interface Department {
+  id: string;
+  name: string;
+  code: string;
+  createdAt: number;
+}
+
+export const defaultDepartments: Department[] = [
+  { id: "dept1", name: "CSE", code: "CSE", createdAt: Date.now() - 86400000 * 30 },
+  { id: "dept2", name: "ECE", code: "ECE", createdAt: Date.now() - 86400000 * 29 },
+  { id: "dept3", name: "BBA", code: "BBA", createdAt: Date.now() - 86400000 * 28 },
+  { id: "dept4", name: "MBA", code: "MBA", createdAt: Date.now() - 86400000 * 27 },
+  { id: "dept5", name: "Mechanical", code: "MECH", createdAt: Date.now() - 86400000 * 26 },
+  { id: "dept6", name: "Civil", code: "CIVIL", createdAt: Date.now() - 86400000 * 25 },
+];
+
 export const departments = ["CSE", "ECE", "BBA", "MBA", "Mechanical", "Civil"];
 export const courses: Record<string, string[]> = {
   CSE: ["B.Tech", "M.Tech"],
@@ -299,6 +315,9 @@ export const store = {
 
   getStudentFees: () => loadData<StudentFeeRecord[]>("nexora_student_fees", defaultStudentFees),
   setStudentFees: (data: StudentFeeRecord[]) => saveData("nexora_student_fees", data),
+
+  getDepartments: () => loadData<Department[]>("nexora_departments", defaultDepartments),
+  setDepartments: (data: Department[]) => saveData("nexora_departments", data),
 };
 
 // React Hook
