@@ -47,7 +47,45 @@ const Reports = () => {
     setReports(store.getReports());
   }, []);
 
-  // ... keep existing code (handleView, handleEditClick, handleDeleteClick, handleDownload)
+  const handleView = (report: ReportRecord) => {
+    setSelectedReport(report);
+    setIsPreviewOpen(true);
+  };
+
+  const handleEditClick = (report: ReportRecord) => {
+    setSelectedReport(report);
+    setIsEditOpen(true);
+  };
+
+  const handleDeleteClick = (report: ReportRecord) => {
+    setReportToDelete(report);
+    setIsDeleteOpen(true);
+  };
+
+  const handleDownload = (report: ReportRecord) => {
+    if (report.fileUrl) {
+      const link = document.createElement("a");
+      link.href = report.fileUrl;
+      link.download = report.title + ".pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(report.title, 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Type: ${report.type}`, 20, 30);
+    doc.text(`Date: ${report.date}`, 20, 40);
+    doc.setLineWidth(0.5);
+    doc.line(20, 45, 190, 45);
+    doc.setFontSize(11);
+    doc.text("Summary:", 20, 55);
+    const splitText = doc.splitTextToSize(report.content || "Sample report content", 170);
+    doc.text(splitText, 20, 65);
+    doc.save(`${report.title}.pdf`);
+  };
 
   const handleCreateAI = async (category: string) => {
     // Simulate brief generation delay
@@ -113,7 +151,7 @@ const Reports = () => {
             <h1 className="text-2xl font-bold text-foreground">Reports</h1>
             <p className="text-sm text-muted-foreground">Generated reports and documents</p>
           </div>
-          <Button onClick={handleGenerateReport} className="gradient-primary text-foreground glow-primary gap-2">
+          <Button onClick={() => setIsCreateOpen(true)} className="gradient-primary text-foreground glow-primary gap-2">
             <Plus className="w-4 h-4" />
             Generate New Report
           </Button>
