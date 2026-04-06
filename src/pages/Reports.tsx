@@ -217,6 +217,13 @@ const Reports = () => {
         reportTitle={reportToDelete?.title}
         onConfirm={handleConfirmDelete}
       />
+
+      <CreateReportModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onCreateManual={handleCreateManual}
+        onCreateAI={handleCreateAI}
+      />
     </DashboardLayout>
   );
 };
