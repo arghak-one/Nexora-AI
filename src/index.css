@@ -6,6 +6,60 @@
 
 @layer base {
   :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 12%;
+
+    --primary: 222 84% 55%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 30% 94%;
+    --secondary-foreground: 222 47% 20%;
+
+    --muted: 210 30% 94%;
+    --muted-foreground: 215 18% 40%;
+
+    --accent: 255 88% 62%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 12%;
+
+    --info: 191 85% 42%;
+    --info-foreground: 210 40% 98%;
+
+    --border: 214 28% 86%;
+    --input: 214 28% 86%;
+    --ring: 222 84% 55%;
+
+    --radius: 0.75rem;
+
+    --glow-primary: 222 84% 55%;
+    --glow-accent: 255 88% 62%;
+    --glow-teal: 191 85% 42%;
+
+    --sidebar-background: 210 33% 97%;
+    --sidebar-foreground: 215 18% 38%;
+    --sidebar-primary: 222 84% 55%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 30% 93%;
+    --sidebar-accent-foreground: 222 47% 18%;
+    --sidebar-border: 214 28% 86%;
+    --sidebar-ring: 222 84% 55%;
+  }
+
+  .dark {
     --background: 222 47% 6%;
     --foreground: 210 40% 96%;
 
@@ -42,8 +96,6 @@
     --border: 222 30% 16%;
     --input: 222 30% 16%;
     --ring: 217 91% 60%;
-
-    --radius: 0.75rem;
 
     --glow-primary: 217 91% 60%;
     --glow-accent: 262 83% 58%;
@@ -151,4 +203,33 @@
 
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+body.compact-layout .compact-page {
+  gap: 1rem;
+}
+
+body.compact-layout .compact-card {
+  padding: 1rem !important;
+  border-radius: 0.85rem !important;
+}
+
+body.compact-layout .compact-row {
+  padding: 0.55rem 0.7rem !important;
+}
+
+body.compact-layout .compact-main {
+  padding: 0.75rem !important;
+}
+
+body.compact-layout .compact-header {
+  height: 3.25rem !important;
+}
+
+body.reduce-animations *,
+body.reduce-animations *::before,
+body.reduce-animations *::after {
+  animation: none !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
 }

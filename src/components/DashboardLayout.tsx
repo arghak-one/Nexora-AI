@@ -25,7 +25,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
-          <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-border/50 glass-strong sticky top-0 z-30">
+          <header className="h-16 compact-header flex items-center justify-between px-4 md:px-6 border-b border-border/50 glass-strong sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
               <div className="hidden md:block">
@@ -39,7 +39,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <ProfileDropdown />
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-6 gradient-bg overflow-auto">
+          <main className="flex-1 p-4 md:p-6 compact-main gradient-bg overflow-auto">
             {children}
           </main>
         </div>
